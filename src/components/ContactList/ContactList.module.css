@@ -1,0 +1,9 @@
+/* src/components/ContactList/ContactList.module.css */
+.contactList {
+  list-style: none;
+  padding: 0;
+}
+
+.contactList li {
+  margin-bottom: 10px;
+}
