@@ -1,54 +1,27 @@
-import { useState, useEffect } from 'react';
+
+import { useSelector, useDispatch } from 'react-redux';
 import ContactForm from './components/ContactForm/ContactForm';
 import ContactList from './components/ContactList/ContactList';
-import '../styles/styles.css'
+import Filter from './components/Filter/Filter';
+import { selectFilteredContacts } from './redux/selectors';
+import { changeFilter } from './redux/filtersSlice';
+import '../styles/styles.css';
 
 const App = () => {
-  const [contacts, setContacts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    const savedContacts = localStorage.getItem('contacts');
-    if (savedContacts) {
-      setContacts(JSON.parse(savedContacts));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  const addContact = (newContact) => {
-    setContacts([...contacts, newContact]);
-  };
-
-  const deleteContact = (id) => {
-    setContacts(contacts.filter(contact => contact.id !== id));
-  };
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectFilteredContacts);
+  const filter = useSelector((state) => state.filters.name);
 
   const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
+    dispatch(changeFilter(event.target.value));
   };
-
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="phonebook">
       <h1>Список контактів</h1>
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Пошук за ім'ям"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-      </div>
-      <ContactForm addContact={addContact} />
-      <ul className="contact-list">
-        <ContactList contacts={filteredContacts} deleteContact={deleteContact} />
-      </ul>
+      <Filter filter={filter} onSearchChange={handleSearchChange} />
+      <ContactForm />
+      <ContactList contacts={contacts} />
     </div>
   );
 };

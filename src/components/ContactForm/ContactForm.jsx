@@ -1,10 +1,26 @@
-
-import PropTypes from 'prop-types';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { nanoid } from 'nanoid';
+import { addContact, selectContacts } from '../../redux/contactsSlice';
 
-const ContactForm = ({ addContact }) => {
+const ContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+
+  useEffect(() => {
+    const savedContacts = localStorage.getItem('contacts');
+    if (savedContacts) {
+      const parsedContacts = JSON.parse(savedContacts);
+      parsedContacts.forEach(contact => dispatch(addContact(contact)));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
   const validationSchema = Yup.object({
     name: Yup.string()
       .min(3, 'Мінімальна кількість символів - 3')
@@ -21,7 +37,7 @@ const ContactForm = ({ addContact }) => {
       id: nanoid(),
       ...values,
     };
-    addContact(newContact);
+    dispatch(addContact(newContact));
     resetForm();
   };
 
@@ -48,10 +64,6 @@ const ContactForm = ({ addContact }) => {
       )}
     </Formik>
   );
-};
-
-ContactForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
 };
 
 export default ContactForm;
