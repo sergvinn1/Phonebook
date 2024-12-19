@@ -1,16 +1,21 @@
-
+import React, { useEffect } from 'react'; // Додайте цей рядок
 import { useSelector, useDispatch } from 'react-redux';
 import ContactForm from './components/ContactForm/ContactForm';
 import ContactList from './components/ContactList/ContactList';
 import Filter from './components/Filter/Filter';
-import { selectFilteredContacts } from './redux/selectors';
-import { changeFilter } from './redux/filtersSlice';
+import { fetchContacts } from './redux/contactsOps';
+import { selectFilteredContacts, selectLoading, selectError } from './redux/contactsSlice';
 import '../styles/styles.css';
 
 const App = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(selectFilteredContacts);
-  const filter = useSelector((state) => state.filters.name);
+  const loading = useSelector(selectLoading);
+  const error = useSelector(selectError);
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   const handleSearchChange = (event) => {
     dispatch(changeFilter(event.target.value));
@@ -19,9 +24,13 @@ const App = () => {
   return (
     <div className="phonebook">
       <h1>Список контактів</h1>
-      <Filter filter={filter} onSearchChange={handleSearchChange} />
+      <Filter onSearchChange={handleSearchChange} />
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error}</p>}
       <ContactForm />
-      <ContactList contacts={contacts} />
+      <ul className="contact-list">
+        <ContactList contacts={contacts} />
+      </ul>
     </div>
   );
 };

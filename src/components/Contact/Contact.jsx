@@ -1,7 +1,7 @@
-
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
-import { deleteContact } from '../../redux/contactsSlice';
+import { deleteContact } from '../../redux/contactsOps'; // Оновлено імпорт
 
 const Contact = ({ contact }) => {
   const dispatch = useDispatch();
